@@ -235,6 +235,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
 }
 .sobre.abierto .solapa{transform:rotateX(-178deg);z-index:0;}
 
+/* al guardar la carta, la solapa y la hoja se mueven sin esperar */
+.sobre.cerrando .hoja-mini,
+.sobre.cerrando .solapa{transition-delay:0s;}
+
 .sello{
   position:absolute;left:50%;top:46%;
   width:31%;aspect-ratio:1;
@@ -317,10 +321,20 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
 }
 #hoja.abierta{display:block;}
 #hoja.ver{opacity:1;transform:none;}
+
+/* al cerrar, la hoja se encoge hacia abajo, como si volviera al sobre */
+#hoja.guardando{
+  opacity:0;
+  transform:translateY(70px) scale(.7);
+  transition:opacity .75s ease, transform .95s cubic-bezier(.5,0,.75,0);
+}
+/* El filo del papel va por DEBAJO de los stickers (z-index -2), para que
+   la línea no les pase por encima y parezcan pegados de verdad. */
 #hoja::before{
   content:'';position:absolute;inset:0;
   border:1px solid var(--papel-borde);
   border-radius:3px;pointer-events:none;
+  z-index:-2;
 }
 
 .mono{display:block;width:clamp(56px,15vw,76px);margin:0 auto 18px;}
@@ -1715,6 +1729,10 @@ const CARTA = {
     pendientes.forEach(clearTimeout);
     pendientes = [];
 
+    // por si estaba a medio guardarse, se borra el rastro del cierre
+    hoja.classList.remove('guardando');
+    sobre.classList.remove('cerrando');
+
     escena.classList.add('abriendo');
     sobre.classList.add('abierto');
     vibrar(12);
@@ -1773,28 +1791,42 @@ const CARTA = {
     rebobinarCancion();
 
     vibrar(10);
+    apagarFuegos();
     window.scrollTo(0, 0);
 
-    // la hoja se recoge
-    hoja.style.transition = '';
-    hoja.style.opacity = '';
-    hoja.style.transform = '';
-    hoja.classList.remove('ver');
-
     $('#velo').classList.remove('ver');
-    $('#decor').classList.remove('ver');
     $('#controles').classList.remove('ver');
     $('#baja').classList.remove('ver');
     $('#respuesta').classList.remove('ver');
 
-    // el sobre vuelve, cerrado y con su sello
-    escena.style.display = '';
-    void escena.offsetHeight;          // que el navegador registre el cambio
-    escena.classList.remove('fuera', 'abriendo');
-    sobre.classList.remove('abierto');
+    // --- Se cierra al revés de como se abrió, como si la guardara ---
 
+    // 1) la hoja se encoge y baja, buscando el sobre
+    hoja.style.transition = '';
+    hoja.style.opacity = '';
+    hoja.style.transform = '';
+    hoja.classList.remove('ver');
+    hoja.classList.add('guardando');
+
+    // 2) vuelve la escena, con el sobre todavía abierto y la hoja asomando
     agendar(() => {
-      hoja.classList.remove('abierta');
+      escena.style.display = '';
+      sobre.classList.add('abierto', 'cerrando');
+      void escena.offsetHeight;              // que registre el estado inicial
+      escena.classList.remove('fuera', 'abriendo');
+      $('#decor').classList.remove('ver');
+    }, 620);
+
+    // 3) el sobre se cierra: la hoja entra, la solapa baja y vuelve el sello
+    agendar(() => {
+      sobre.classList.remove('abierto');
+      vibrar(14);
+    }, 1500);
+
+    // 4) a limpiar, ya con el sobre cerrado
+    agendar(() => {
+      sobre.classList.remove('cerrando');
+      hoja.classList.remove('abierta', 'guardando');
       document.documentElement.classList.remove('leyendo');
       window.scrollTo(0, 0);
 
@@ -1805,21 +1837,7 @@ const CARTA = {
         if (el) el.textContent = '0';
       });
       yaBajo = false;
-
-      reiniciarPortada();
-    }, 900);
-  }
-
-  // las animaciones de entrada del sobre solo corren una vez; hay que
-  // rebobinarlas a mano para que la reapertura se vea igual de bonita
-  function reiniciarPortada(){
-    ['.intro', '.sobre-zona', '.pista'].forEach(sel => {
-      const el = escena.querySelector(sel);
-      if (!el) return;
-      el.style.animation = 'none';
-      void el.offsetHeight;
-      el.style.animation = '';
-    });
+    }, 2500);
   }
 
   sobre.addEventListener('click', abrir);
@@ -1893,11 +1911,41 @@ const CARTA = {
   /* ============================================================
      6. BOTONES
      ============================================================ */
+  /* --- bajar solo, sin depender del scroll suave del navegador --- */
+  function bajarHasta(elemento, margen){
+    if (!elemento) return;
+    const destino = cuantoBajo() + elemento.getBoundingClientRect().bottom
+                    - vh() + (margen || 24);
+    const tope = Math.max(0, Math.min(destino, document.documentElement.scrollHeight - vh()));
+    const desde = cuantoBajo();
+    const salto = tope - desde;
+    if (Math.abs(salto) < 4) return;
+
+    if (menosMovimiento){ window.scrollTo(0, tope); return; }
+
+    const dur = 900, t0 = performance.now();
+    (function paso(ahora){
+      const p = Math.min(1, (ahora - t0) / dur);
+      const suave = 1 - Math.pow(1 - p, 3);
+      window.scrollTo(0, desde + salto * suave);
+      if (p < 1) requestAnimationFrame(paso);
+    })(performance.now());
+
+    // si el navegador congelara las animaciones, al menos llega
+    setTimeout(() => { if (Math.abs(cuantoBajo() - tope) > 40) window.scrollTo(0, tope); }, dur + 200);
+  }
+
   $('#btn-perdon').addEventListener('click', () => {
-    $('#respuesta').classList.add('ver');
+    const resp = $('#respuesta');
+    resp.classList.add('ver');
     vibrar([12, 50, 12, 50, 20]);
     fuegosArtificiales();
     lluviaDeCorazones();
+
+    // la carta baja sola para que se lea todo el mensaje mientras aparece
+    agendar(() => bajarHasta(resp, 30), 450);
+    agendar(() => bajarHasta(resp, 30), 1600);
+    agendar(() => bajarHasta($('.acciones'), 30), 2900);
   });
 
   $('#btn-cerrar').addEventListener('click', cerrar);
