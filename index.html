@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#080b17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Para ti</title>
+
+<meta property="og:title" content="Tengo algo que decirte">
+<meta property="og:description" content="Ábrelo cuando estés tranquila.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Dancing+Script:wght@500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   PALETA
+   ============================================================ */
+:root{
+  /* noche */
+  --noche:#080b17;
+  --tinta-clara:#f3efe7;
+  --tinta-clara-suave:rgba(243,239,231,.66);
+  --oro:#d8b26a;
+  --oro-suave:rgba(216,178,106,.35);
+
+  /* papel */
+  --papel:#f8f4ea;
+  --papel-borde:#efe8d8;
+  --texto:#332c24;
+  --texto-suave:#6b5f51;
+  --acento:#9a7333;
+  --renglon:rgba(51,44,36,.075);
+
+  /* sobre */
+  --sobre:#e9e0d2;
+  --sobre-osc:#d8ccb8;
+
+  --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --mano:'Dancing Script', 'Segoe Script', cursive;
+  --sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --safe-t:env(safe-area-inset-top, 0px);
+  --safe-b:env(safe-area-inset-bottom, 0px);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+html,body{
+  height:100%;
+  background:var(--noche);
+  color:var(--tinta-clara);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
+}
+
+body{overflow:hidden;}
+body.leyendo{overflow:auto;-webkit-overflow-scrolling:touch;}
+
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
+
+/* fondo: cielo estrellado, siempre presente */
+#cielo{position:fixed;inset:0;z-index:0;display:block;}
+
+.halo{
+  position:fixed;
+  left:50%;top:42%;
+  width:min(140vw,900px);height:min(140vw,900px);
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(216,178,106,.13) 0%, rgba(216,178,106,.05) 35%, transparent 68%);
+  z-index:1;pointer-events:none;
+  animation:respirar 9s ease-in-out infinite;
+}
+@keyframes respirar{
+  0%,100%{opacity:.75;transform:translate(-50%,-50%) scale(1);}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.09);}
+}
+
+/* velo que oscurece el cielo cuando ya se está leyendo la hoja */
+.velo{
+  position:fixed;inset:0;z-index:2;
+  background:rgba(4,6,13,.55);
+  opacity:0;pointer-events:none;
+  transition:opacity 1.2s ease;
+}
+.velo.ver{opacity:1;}
+
+@keyframes aparecer{to{opacity:1;}}
+
+/* ============================================================
+   PORTADA · EL SOBRE
+   ============================================================ */
+#escena{
+  position:fixed;inset:0;z-index:4;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:clamp(30px,8vh,58px);
+  padding:calc(var(--safe-t) + 24px) 22px calc(var(--safe-b) + 24px);
+  transition:opacity .85s ease, transform 1s cubic-bezier(.4,0,.2,1);
+}
+#escena.fuera{opacity:0;transform:scale(1.28);pointer-events:none;}
+
+.intro{
+  text-align:center;
+  opacity:0;
+  animation:aparecer 1.6s ease .3s forwards;
+}
+.intro .para{
+  font-size:.66rem;letter-spacing:.36em;text-transform:uppercase;
+  color:var(--oro);margin-bottom:14px;
+}
+.intro .nombre{
+  font-family:var(--serif);
+  font-size:clamp(2.3rem,10.5vw,3.2rem);
+  font-weight:300;line-height:1.05;
+}
+
+.sobre-zona{
+  perspective:1400px;
+  opacity:0;
+  animation:aparecer 1.6s ease .9s forwards;
+}
+
+.sobre{
+  position:relative;
+  width:min(80vw,330px);
+  height:calc(min(80vw,330px) * .66);
+  transform-style:preserve-3d;
+  transition:transform .9s cubic-bezier(.4,0,.2,1);
+  filter:drop-shadow(0 26px 45px rgba(0,0,0,.55));
+}
+.sobre:active{transform:scale(.975);}
+.sobre.abierto{transform:translateY(5%);}
+.sobre.abierto:active{transform:translateY(5%);}
+
+.sobre-fondo{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,var(--sobre) 0%, var(--sobre-osc) 100%);
+  border-radius:5px;z-index:1;
+}
+
+/* la hoja doblada que asoma al abrir */
+.hoja-mini{
+  position:absolute;left:6%;bottom:5%;
+  width:88%;height:86%;
+  background:linear-gradient(175deg,#f9f5ec 0%, #e8e0cf 100%);
+  border-radius:3px;z-index:2;
+  transform:translateY(0);
+  transition:transform 1.05s cubic-bezier(.34,1.15,.64,1) .5s;
+  box-shadow:0 2px 10px rgba(0,0,0,.18);
+  overflow:hidden;
+}
+.hoja-mini::before{
+  content:'';position:absolute;inset:14% 13%;
+  background:repeating-linear-gradient(to bottom,
+    rgba(51,44,36,.17) 0 1px, transparent 1px 10px);
+  opacity:.6;
+}
+.sobre.abierto .hoja-mini{transform:translateY(-64%) scale(1.02);}
+
+.sobre-frente{
+  position:absolute;inset:0;
+  background:linear-gradient(155deg,#efe7db 0%, #ddd1bd 100%);
+  clip-path:polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+  border-radius:5px;z-index:3;
+}
+.sobre-frente::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg, rgba(255,255,255,.35) 0%, transparent 45%);
+  opacity:.7;
+}
+
+.solapa{
+  position:absolute;top:0;left:0;
+  width:100%;height:46%;
+  background:linear-gradient(180deg,#f0e8dc 0%, #ded2be 100%);
+  clip-path:polygon(0 0, 100% 0, 50% 100%);
+  transform-origin:top center;
+  transform:rotateX(0deg);
+  transition:transform .85s cubic-bezier(.6,0,.3,1), z-index 0s .42s;
+  z-index:5;border-radius:5px 5px 0 0;
+  backface-visibility:hidden;
+}
+.sobre.abierto .solapa{transform:rotateX(-178deg);z-index:0;}
+
+.sello{
+  position:absolute;left:50%;top:46%;
+  width:19%;aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #c65f6b 0%, #9e3644 62%, #7d2634 100%);
+  box-shadow:0 3px 9px rgba(0,0,0,.35), inset 0 -2px 6px rgba(0,0,0,.3);
+  z-index:6;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);
+  font-size:clamp(.8rem,3.4vw,1.05rem);
+  color:rgba(255,255,255,.92);letter-spacing:.06em;
+  transition:opacity .35s ease .1s, transform .5s ease;
+}
+.sobre.abierto .sello{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(30deg);}
+
+/* "Toca para abrir" */
+.pista{
+  text-align:center;
+  opacity:0;
+  animation:aparecer 1.4s ease 2s forwards;
+}
+.pista .toca{
+  font-size:.82rem;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:#fff;
+  text-shadow:0 0 18px rgba(216,178,106,.45);
+  display:inline-flex;align-items:center;gap:12px;
+  animation:latir 3.4s ease-in-out infinite;
+}
+.pista .toca::before,.pista .toca::after{
+  content:'';width:24px;height:1px;background:var(--oro-suave);
+}
+@keyframes latir{
+  0%,100%{opacity:.78;}
+  50%{opacity:1;}
+}
+.pulso{
+  margin:16px auto 0;width:7px;height:7px;border-radius:50%;
+  background:var(--oro);
+  animation:pulso 2.4s ease-out infinite;
+}
+@keyframes pulso{
+  0%{box-shadow:0 0 0 0 rgba(216,178,106,.45);}
+  70%{box-shadow:0 0 0 22px rgba(216,178,106,0);}
+  100%{box-shadow:0 0 0 0 rgba(216,178,106,0);}
+}
+#escena.abriendo .pista{opacity:0;transition:opacity .35s ease;animation:none;}
+
+/* ============================================================
+   LA HOJA · todo el mensaje va escrito aquí
+   ============================================================ */
+#hoja{
+  position:relative;z-index:5;
+  display:none;
+  width:min(92vw,40rem);
+  margin:calc(var(--safe-t) + 26px) auto calc(var(--safe-b) + 40px);
+  padding:clamp(38px,9vw,72px) clamp(26px,7vw,58px) clamp(52px,11vw,80px);
+
+  background:
+    /* dobleces de la hoja, muy sutiles */
+    linear-gradient(to bottom, transparent 32.8%, rgba(51,44,36,.055) 33%, transparent 33.2%),
+    linear-gradient(to bottom, transparent 66.3%, rgba(51,44,36,.045) 66.5%, transparent 66.7%),
+    /* tono del papel */
+    linear-gradient(168deg, #fbf8f0 0%, var(--papel) 42%, #f2ece0 100%);
+
+  color:var(--texto);
+  border-radius:3px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.7) inset,
+    0 34px 70px rgba(0,0,0,.55),
+    0 6px 18px rgba(0,0,0,.35);
+
+  opacity:0;
+  transform:translateY(46px) scale(.78);
+  transform-origin:center top;
+  transition:opacity 1s ease, transform 1.25s cubic-bezier(.18,.78,.25,1);
+}
+#hoja.abierta{display:block;}
+#hoja.ver{opacity:1;transform:none;}
+
+/* borde de papel rasgado, apenas insinuado */
+#hoja::before{
+  content:'';position:absolute;inset:0;
+  border:1px solid var(--papel-borde);
+  border-radius:3px;pointer-events:none;
+}
+
+/* --- encabezado --- */
+.encabezado{text-align:center;margin-bottom:clamp(34px,7vw,50px);}
+.encabezado .fecha{
+  font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--acento);margin-bottom:16px;
+}
+.encabezado h1{
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(2.1rem,10vw,3rem);
+  line-height:1.06;
+  color:var(--texto);
+}
+.encabezado .linea{
+  width:42px;height:1px;background:var(--acento);
+  margin:24px auto 0;opacity:.55;
+}
+
+/* --- párrafos --- */
+p.parrafo{
+  font-family:var(--serif);
+  font-size:clamp(1.16rem,4.6vw,1.32rem);
+  font-weight:400;
+  line-height:1.82;
+  color:var(--texto);
+  margin-bottom:1.35em;
+  text-align:left;
+}
+p.parrafo:first-of-type::first-letter{
+  font-size:2.9em;
+  float:left;
+  line-height:.82;
+  padding:.06em .09em 0 0;
+  color:var(--acento);
+  font-weight:500;
+}
+p.parrafo em{font-style:italic;color:#1f1a14;}
+p.parrafo strong{font-weight:600;color:var(--acento);}
+
+/* --- separador de tinta --- */
+.separador{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  margin:clamp(34px,7vw,48px) 0;
+  color:var(--acento);opacity:.5;
+}
+.separador::before,.separador::after{
+  content:'';height:1px;flex:1;max-width:70px;
+  background:currentColor;
+}
+.separador span{font-family:var(--serif);font-size:.95rem;}
+
+/* --- cita --- */
+.cita{
+  text-align:center;
+  margin:clamp(30px,6vw,44px) 0;
+  padding:0 6px;
+}
+.cita p{
+  font-family:var(--serif);
+  font-style:italic;font-weight:400;
+  font-size:clamp(1.26rem,5.2vw,1.55rem);
+  line-height:1.58;color:#1f1a14;
+}
+.cita p::before{content:'“';color:var(--acento);}
+.cita p::after{content:'”';color:var(--acento);}
+
+/* --- lista --- */
+.titulo-seccion{
+  font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--acento);text-align:center;
+  margin:clamp(38px,8vw,56px) 0 22px;
+}
+.lista{list-style:none;}
+.lista li{
+  font-family:var(--serif);
+  font-size:clamp(1.08rem,4.3vw,1.2rem);
+  font-weight:400;line-height:1.6;
+  padding:13px 0 13px 26px;
+  position:relative;
+  border-bottom:1px solid var(--renglon);
+}
+.lista li::before{
+  content:'';position:absolute;left:5px;top:24px;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--acento);opacity:.75;
+}
+.lista li:last-child{border-bottom:none;}
+
+/* --- contador --- */
+.contador{
+  text-align:center;
+  margin:clamp(38px,8vw,56px) 0;
+  padding:clamp(26px,6vw,38px) 18px;
+  border-top:1px solid var(--renglon);
+  border-bottom:1px solid var(--renglon);
+}
+.contador .num{
+  font-family:var(--serif);
+  font-size:clamp(3rem,15vw,4.4rem);
+  font-weight:400;line-height:1;color:var(--texto);
+}
+.contador .etq{
+  font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--texto-suave);margin-top:14px;
+}
+.contador .sub{
+  font-family:var(--serif);font-style:italic;
+  font-size:1.02rem;color:var(--acento);margin-top:16px;
+}
+
+/* --- firma --- */
+.firma{
+  margin-top:clamp(40px,8vw,58px);
+  text-align:right;
+}
+.firma .txt{
+  font-family:var(--serif);font-style:italic;
+  font-size:1.16rem;color:var(--texto-suave);margin-bottom:4px;
+}
+.firma .yo{
+  font-family:var(--mano);
+  font-size:clamp(2.2rem,10vw,2.9rem);
+  font-weight:600;color:#2a3d5c;
+  line-height:1.2;
+}
+.firma .raya{
+  width:110px;height:1px;background:rgba(42,61,92,.35);
+  margin:6px 0 0 auto;
+}
+
+/* --- botones --- */
+.acciones{
+  margin-top:clamp(42px,9vw,62px);
+  display:flex;flex-direction:column;gap:12px;align-items:center;
+}
+.btn{
+  width:100%;max-width:18rem;
+  padding:15px 24px;
+  border:1px solid rgba(154,115,51,.45);
+  border-radius:100px;
+  font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--acento);text-align:center;text-decoration:none;
+  transition:background .3s ease, transform .15s ease;
+  display:block;
+}
+.btn:active{transform:scale(.97);background:rgba(154,115,51,.1);}
+.btn.principal{background:rgba(154,115,51,.12);border-color:rgba(154,115,51,.7);}
+.btn.tenue{border-color:rgba(51,44,36,.16);color:var(--texto-suave);}
+
+.respuesta{
+  margin-top:26px;text-align:center;
+  font-family:var(--serif);font-style:italic;
+  font-size:1.18rem;line-height:1.62;color:#1f1a14;
+  max-height:0;opacity:0;overflow:hidden;
+  transition:max-height .9s ease, opacity .9s ease;
+}
+.respuesta.ver{max-height:340px;opacity:1;}
+
+/* ============================================================
+   CONTROLES
+   ============================================================ */
+.controles{
+  position:fixed;
+  top:calc(var(--safe-t) + 12px);right:14px;
+  z-index:20;display:none;gap:8px;
+}
+.controles.ver{display:flex;}
+.ctrl{
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(243,239,231,.16);
+  background:rgba(10,14,28,.6);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.92rem;color:var(--tinta-clara-suave);
+  transition:color .3s ease, border-color .3s ease, transform .15s ease;
+}
+.ctrl:active{transform:scale(.9);}
+.ctrl.on{color:var(--oro);border-color:var(--oro-suave);}
+
+.baja{
+  position:fixed;left:50%;bottom:calc(var(--safe-b) + 16px);
+  transform:translateX(-50%);
+  z-index:15;text-align:center;
+  font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--tinta-clara-suave);
+  opacity:0;transition:opacity .8s ease;pointer-events:none;
+  text-shadow:0 1px 6px rgba(0,0,0,.6);
+}
+.baja.ver{opacity:.8;}
+.baja .flecha{
+  display:block;margin:8px auto 0;width:1px;height:22px;
+  background:linear-gradient(var(--oro), transparent);
+  animation:bajar 2.2s ease-in-out infinite;
+}
+@keyframes bajar{
+  0%,100%{transform:translateY(0);opacity:.3;}
+  50%{transform:translateY(7px);opacity:1;}
+}
+
+.corazon{
+  position:fixed;bottom:-40px;z-index:30;
+  font-size:18px;pointer-events:none;
+  animation:subir linear forwards;
+}
+@keyframes subir{
+  0%{transform:translateY(0) scale(.6);opacity:0;}
+  12%{opacity:.9;}
+  100%{transform:translateY(-108vh) scale(1.05);opacity:0;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.25s !important;}
+  #hoja{opacity:1;transform:none;}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="cielo"></canvas>
+<div class="halo"></div>
+<div class="velo" id="velo"></div>
+
+<!-- ══════════ PORTADA: EL SOBRE ══════════ -->
+<section id="escena">
+  <div class="intro">
+    <div class="para">Para</div>
+    <div class="nombre" id="nombre-portada">Mi amor</div>
+  </div>
+
+  <div class="sobre-zona">
+    <div class="sobre" id="sobre" role="button" tabindex="0" aria-label="Toca para abrir la carta">
+      <div class="sobre-fondo"></div>
+      <div class="hoja-mini"></div>
+      <div class="sobre-frente"></div>
+      <div class="solapa"></div>
+      <div class="sello" id="sello">G</div>
+    </div>
+  </div>
+
+  <div class="pista">
+    <div class="toca">Toca para abrir</div>
+    <div class="pulso"></div>
+  </div>
+</section>
+
+<!-- ══════════ CONTROLES ══════════ -->
+<div class="controles" id="controles">
+  <button class="ctrl" id="btn-musica" aria-label="Música">♪</button>
+</div>
+
+<div class="baja" id="baja">Desliza<span class="flecha"></span></div>
+
+<!-- ══════════ LA HOJA ══════════ -->
+<article id="hoja">
+
+  <header class="encabezado">
+    <div class="fecha" id="fecha-hoy"></div>
+    <h1 id="nombre-carta">Mi amor</h1>
+    <div class="linea"></div>
+  </header>
+
+  <div id="cuerpo-1"></div>
+
+  <div class="cita"><p id="cita-1"></p></div>
+
+  <div class="titulo-seccion">Lo que amo de ti</div>
+  <ul class="lista" id="lista-cosas"></ul>
+
+  <div class="contador" id="contador-zona">
+    <div class="num" id="dias">—</div>
+    <div class="etq">días a tu lado</div>
+    <div class="sub" id="dias-sub"></div>
+  </div>
+
+  <div class="separador"><span>❧</span></div>
+
+  <div id="cuerpo-2"></div>
+
+  <div class="cita"><p id="cita-2"></p></div>
+
+  <div id="cuerpo-3"></div>
+
+  <div class="firma">
+    <div class="txt" id="despedida"></div>
+    <div class="yo" id="firma-nombre"></div>
+    <div class="raya"></div>
+  </div>
+
+  <div class="acciones">
+    <button class="btn principal" id="btn-perdon"></button>
+    <div class="respuesta" id="respuesta"></div>
+    <a class="btn tenue" id="btn-responder" href="#" style="display:none">Escríbeme</a>
+    <button class="btn tenue" id="btn-otra">Leerla otra vez</button>
+  </div>
+
+</article>
+
+<script>
+/* ============================================================
+   ✏️  AQUÍ SE EDITA TODO. Cambia solo los textos entre comillas.
+   ============================================================ */
+const CARTA = {
+
+  // --- Nombres ---
+  ella:        "Mi amor",        // ← el nombre de ella
+  tu:          "Gabriel",        // ← tu nombre (va en la firma, con letra manuscrita)
+  inicialSello:"G",              // ← letra del sello de cera del sobre
+
+  // --- Fecha en que empezaron (año, mes, día). Mes: 1 = enero ---
+  desde: { anio: 2024, mes: 1, dia: 1 },
+
+  // --- Primera parte: lo romántico ---
+  cuerpo1: [
+    "Te escribo esto de noche, que es cuando pienso mejor y cuando más te extraño. No sé escribir cartas bonitas, pero sé exactamente lo que siento, y quería que lo tuvieras en algún lugar al que pudieras volver.",
+    "Antes de ti yo era una persona que iba pasando por los días. Contigo empecé a <em>vivirlos</em>. Me acostumbré a tu risa, a cómo dices mi nombre cuando estás contenta, a la forma en que ves las cosas y me obligas a verlas mejor.",
+    "Eres lo más bonito que me ha pasado. Y no lo digo como frase; lo digo como quien reconoce un hecho."
+  ],
+
+  cita1: "Eres mi lugar favorito, incluso cuando estamos lejos.",
+
+  // --- Lista: cosas que amas de ella ---
+  cosas: [
+    "Tu risa, sobre todo cuando se te escapa sin querer.",
+    "Lo terca que eres cuando tienes razón.",
+    "Cómo te preocupas por todos, incluso cuando nadie te lo pide.",
+    "La manera en que me miras cuando crees que no me doy cuenta.",
+    "Que contigo hasta lo aburrido se vuelve bonito.",
+    "Tu forma de perdonar, que es la que estoy necesitando hoy."
+  ],
+
+  // --- Segunda parte: la disculpa ---
+  cuerpo2: [
+    "Y justo por todo eso, tengo que decirte otra cosa.",
+    "<strong>Perdóname.</strong> No quiero adornarlo ni buscar excusas, porque las excusas son para el que se quiere sentir mejor, y aquí el que importa eres tú. Me equivoqué. Te fallé. Y sé que dolió, porque conozco tu cara cuando algo te duele y no quiero volver a vérsela por culpa mía.",
+    "No te pido que hagas como si nada. Te pido que me dejes demostrártelo con hechos, con tiempo, con paciencia. Estoy dispuesto a esperar lo que haga falta, porque tú vales eso y más."
+  ],
+
+  cita2: "No quiero tener la razón. Te quiero a ti.",
+
+  // --- Tercera parte: el cierre ---
+  cuerpo3: [
+    "Si algo aprendí es que el amor no se mide en los días fáciles, sino en los que uno decide quedarse y arreglar lo que rompió.",
+    "Yo me quiero quedar. Contigo. Aunque me toque ganármelo de nuevo.",
+    "Te amo. Hoy más que ayer, y con más cuidado que antes."
+  ],
+
+  despedida:   "Siempre tuyo,",
+
+  // --- Botón final y su respuesta ---
+  textoBoton:  "Te amo",
+  respuesta:   "Gracias por leerme hasta el final.<br>Eso ya es más de lo que merecía hoy.",
+
+  // --- Opcional: tu WhatsApp para que ella te responda ---
+  // Déjalo vacío ("") si no lo quieres. Formato: código de país + número, sin + ni espacios.
+  whatsapp:    "",
+  mensajeWhatsapp: "Leí tu carta..."
+};
+
+/* ============================================================
+   De aquí para abajo no hace falta tocar nada.
+   ============================================================ */
+(function(){
+  'use strict';
+
+  const $ = s => document.querySelector(s);
+  const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Medidas con red de seguridad: algunos navegadores empotrados
+  // reportan 0 y eso rompería los cálculos.
+  const vw = () => window.innerWidth  || document.documentElement.clientWidth  || 390;
+  const vh = () => window.innerHeight || document.documentElement.clientHeight || 844;
+
+  /* ---------- 1. Volcar los textos en la hoja ---------- */
+  function pintar(sel, lista){
+    $(sel).innerHTML = lista.map(t => '<p class="parrafo">' + t + '</p>').join('');
+  }
+
+  $('#nombre-portada').textContent = CARTA.ella;
+  $('#nombre-carta').textContent   = CARTA.ella;
+  $('#sello').textContent          = CARTA.inicialSello;
+  $('#firma-nombre').textContent   = CARTA.tu;
+  $('#despedida').textContent      = CARTA.despedida;
+  $('#cita-1').textContent         = CARTA.cita1;
+  $('#cita-2').textContent         = CARTA.cita2;
+  $('#btn-perdon').textContent     = CARTA.textoBoton;
+  $('#respuesta').innerHTML        = CARTA.respuesta;
+
+  pintar('#cuerpo-1', CARTA.cuerpo1);
+  pintar('#cuerpo-2', CARTA.cuerpo2);
+  pintar('#cuerpo-3', CARTA.cuerpo3);
+
+  $('#lista-cosas').innerHTML = CARTA.cosas.map(c => '<li>' + c + '</li>').join('');
+
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                 'agosto','septiembre','octubre','noviembre','diciembre'];
+  const hoy = new Date();
+  $('#fecha-hoy').textContent = hoy.getDate() + ' de ' + meses[hoy.getMonth()] + ' de ' + hoy.getFullYear();
+
+  const inicio = new Date(CARTA.desde.anio, CARTA.desde.mes - 1, CARTA.desde.dia);
+  const dias = Math.max(0, Math.floor((hoy - inicio) / 86400000));
+  $('#dias-sub').textContent = (dias / 365.25) >= 1
+    ? '...y me siguen pareciendo pocos'
+    : 'y apenas vamos empezando';
+
+  if (CARTA.whatsapp && CARTA.whatsapp.trim() !== ''){
+    const a = $('#btn-responder');
+    a.href = 'https://wa.me/' + CARTA.whatsapp.replace(/\D/g,'') +
+             '?text=' + encodeURIComponent(CARTA.mensajeWhatsapp);
+    a.style.display = 'block';
+  }
+
+  /* ---------- 2. Cielo estrellado ---------- */
+  const canvas = $('#cielo');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  let estrellas = [], fugaz = null, ancho = 0, alto = 0, animando = true;
+
+  function dimensionar(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    ancho = vw();
+    alto  = vh();
+    canvas.width  = Math.floor(ancho * dpr);
+    canvas.height = Math.floor(alto * dpr);
+    canvas.style.width  = ancho + 'px';
+    canvas.style.height = alto + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    crearEstrellas();
+  }
+
+  function crearEstrellas(){
+    const cantidad = Math.round(Math.min(190, (ancho * alto) / 5200));
+    estrellas = [];
+    for (let i = 0; i < cantidad; i++){
+      estrellas.push({
+        x: Math.random() * ancho,
+        y: Math.random() * alto,
+        r: Math.random() * 1.25 + 0.25,
+        base: Math.random() * 0.5 + 0.25,
+        vel: Math.random() * 0.014 + 0.004,
+        fase: Math.random() * Math.PI * 2,
+        calida: Math.random() > 0.82
+      });
+    }
+  }
+
+  function lanzarFugaz(){
+    if (menosMovimiento) return;
+    fugaz = {
+      x: Math.random() * ancho * 0.75,
+      y: Math.random() * alto * 0.4,
+      largo: 90 + Math.random() * 80,
+      vel: 7 + Math.random() * 4,
+      vida: 1
+    };
+  }
+
+  let t = 0;
+  function dibujar(){
+    if (!animando) return;
+    t += 0.016;
+
+    if (vw() !== ancho || vh() !== alto) dimensionar();
+
+    const g = ctx.createLinearGradient(0, 0, 0, alto);
+    g.addColorStop(0, '#0a0f22');
+    g.addColorStop(0.55, '#080b17');
+    g.addColorStop(1, '#05070f');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, ancho, alto);
+
+    for (let i = 0; i < estrellas.length; i++){
+      const e = estrellas[i];
+      const brillo = e.base + Math.sin(t * e.vel * 60 + e.fase) * 0.32;
+      const a = Math.max(0.06, Math.min(1, brillo));
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, 6.2832);
+      ctx.fillStyle = e.calida
+        ? 'rgba(240, 214, 165,' + a + ')'
+        : 'rgba(255, 255, 255,' + a + ')';
+      ctx.fill();
+    }
+
+    if (fugaz){
+      ctx.save();
+      const grad = ctx.createLinearGradient(
+        fugaz.x, fugaz.y, fugaz.x - fugaz.largo, fugaz.y + fugaz.largo * 0.5
+      );
+      grad.addColorStop(0, 'rgba(255,255,255,' + (0.85 * fugaz.vida) + ')');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(fugaz.x, fugaz.y);
+      ctx.lineTo(fugaz.x - fugaz.largo, fugaz.y + fugaz.largo * 0.5);
+      ctx.stroke();
+      ctx.restore();
+
+      fugaz.x += fugaz.vel;
+      fugaz.y -= fugaz.vel * 0.5;
+      fugaz.vida -= 0.012;
+      if (fugaz.vida <= 0 || fugaz.x > ancho + 200) fugaz = null;
+    }
+
+    requestAnimationFrame(dibujar);
+  }
+
+  dimensionar();
+  dibujar();
+  window.addEventListener('resize', dimensionar);
+  window.addEventListener('orientationchange', () => setTimeout(dimensionar, 250));
+
+  setInterval(() => { if (!fugaz && Math.random() > 0.45) lanzarFugaz(); }, 5200);
+  setTimeout(lanzarFugaz, 2600);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden){ animando = false; }
+    else if (!animando){ animando = true; dibujar(); }
+  });
+
+  /* ---------- 3. Abrir el sobre y sacar la hoja ---------- */
+  const sobre  = $('#sobre');
+  const escena = $('#escena');
+  const hoja   = $('#hoja');
+  let abierto = false;
+
+  function abrir(){
+    if (abierto) return;
+    abierto = true;
+
+    escena.classList.add('abriendo');
+    sobre.classList.add('abierto');   // la solapa gira, la hoja asoma
+    vibrar(12);
+    prepararAudio();
+
+    // la escena se aleja mientras la hoja empieza a desplegarse
+    setTimeout(() => {
+      escena.classList.add('fuera');
+      $('#velo').classList.add('ver');
+      lanzarFugaz();
+    }, 1450);
+
+    // la hoja aparece, ya escrita, creciendo desde el centro
+    setTimeout(() => {
+      hoja.classList.add('abierta');
+      document.body.classList.add('leyendo');
+      // pequeña pausa para que el navegador registre el estado inicial
+      // y la transición se vea (setTimeout, no rAF: rAF puede estar congelado)
+      setTimeout(() => hoja.classList.add('ver'), 40);
+      $('#controles').classList.add('ver');
+    }, 1900);
+
+    setTimeout(() => {
+      escena.style.display = 'none';
+      vigilarContador();
+      $('#baja').classList.add('ver');
+    }, 3100);
+
+    // Red de seguridad: si el navegador congelara las animaciones,
+    // a los 4,5 s la hoja se muestra a la fuerza. Nunca una pantalla en blanco.
+    setTimeout(() => {
+      hoja.classList.add('abierta', 'ver');
+      document.body.classList.add('leyendo');
+      if (parseFloat(getComputedStyle(hoja).opacity) < 0.95){
+        hoja.style.transition = 'none';
+        hoja.style.opacity = '1';
+        hoja.style.transform = 'none';
+      }
+    }, 4500);
+  }
+
+  sobre.addEventListener('click', abrir);
+  sobre.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrir(); }
+  });
+
+  /* ---------- 4. Contador de días ---------- */
+  let numeroHecho = false;
+
+  function animarNumero(){
+    if (numeroHecho) return;
+    numeroHecho = true;
+    const el = $('#dias');
+
+    if (menosMovimiento){ el.textContent = dias.toLocaleString('es-MX'); return; }
+
+    const dur = 1900, t0 = performance.now();
+    (function paso(ahora){
+      const p = Math.min(1, (ahora - t0) / dur);
+      const suave = 1 - Math.pow(1 - p, 4);
+      el.textContent = Math.round(dias * suave).toLocaleString('es-MX');
+      if (p < 1) requestAnimationFrame(paso);
+    })(t0);
+
+    // si el navegador congela las animaciones, el número correcto queda igual
+    setTimeout(() => { el.textContent = dias.toLocaleString('es-MX'); }, dur + 150);
+  }
+
+  function vigilarContador(){
+    const zona = $('#contador-zona');
+
+    function revisar(){
+      const r = zona.getBoundingClientRect();
+      if (r.top < vh() * 0.85 && r.bottom > 0){
+        animarNumero();
+        window.removeEventListener('scroll', revisar);
+        clearInterval(repaso);
+      }
+    }
+
+    window.addEventListener('scroll', revisar, { passive: true });
+    const repaso = setInterval(revisar, 500);
+    revisar();
+  }
+
+  // ocultar el "desliza" en cuanto empieza a bajar
+  let yaBajo = false;
+  window.addEventListener('scroll', () => {
+    if (!yaBajo && window.scrollY > 60){
+      yaBajo = true;
+      $('#baja').classList.remove('ver');
+    }
+  }, { passive: true });
+
+  /* ---------- 5. Botones ---------- */
+  $('#btn-perdon').addEventListener('click', () => {
+    $('#respuesta').classList.add('ver');
+    vibrar([10, 40, 10]);
+    lluviaDeCorazones();
+  });
+
+  $('#btn-otra').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: menosMovimiento ? 'auto' : 'smooth' });
+  });
+
+  function lluviaDeCorazones(){
+    if (menosMovimiento) return;
+    const simbolos = ['♥','♡','✦','❥'];
+    for (let i = 0; i < 22; i++){
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'corazon';
+        c.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+        c.style.left = (Math.random() * 92 + 4) + 'vw';
+        c.style.fontSize = (12 + Math.random() * 16) + 'px';
+        c.style.color = Math.random() > 0.5
+          ? 'rgba(216,178,106,.9)'
+          : 'rgba(196,90,104,.85)';
+        c.style.animationDuration = (4.2 + Math.random() * 2.6) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 7200);
+      }, i * 130);
+    }
+  }
+
+  function vibrar(patron){
+    if (navigator.vibrate){ try { navigator.vibrate(patron); } catch(e){} }
+  }
+
+  /* ---------- 6. Música ambiental (generada, sin archivos) ---------- */
+  let audioCtx = null, master = null, sonando = false, loopId = null;
+
+  function prepararAudio(){
+    if (audioCtx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    audioCtx = new AC();
+    master = audioCtx.createGain();
+    master.gain.value = 0;
+    master.connect(audioCtx.destination);
+  }
+
+  const acordes = [
+    [261.63, 329.63, 392.00, 523.25],
+    [196.00, 293.66, 392.00, 493.88],
+    [220.00, 329.63, 440.00, 523.25],
+    [174.61, 261.63, 349.23, 440.00]
+  ];
+
+  function nota(freq, cuando, dur){
+    const osc = audioCtx.createOscillator();
+    const g   = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, cuando);
+    g.gain.exponentialRampToValueAtTime(0.14, cuando + 0.55);
+    g.gain.exponentialRampToValueAtTime(0.0001, cuando + dur);
+    osc.connect(g);
+    g.connect(master);
+    osc.start(cuando);
+    osc.stop(cuando + dur + 0.1);
+  }
+
+  let indiceAcorde = 0;
+  function tocarCompas(){
+    const base = audioCtx.currentTime + 0.05;
+    acordes[indiceAcorde % acordes.length].forEach((f, i) => nota(f, base + i * 0.62, 3.4));
+    indiceAcorde++;
+  }
+
+  $('#btn-musica').addEventListener('click', function(){
+    prepararAudio();
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    if (!sonando){
+      sonando = true;
+      this.classList.add('on');
+      master.gain.cancelScheduledValues(audioCtx.currentTime);
+      master.gain.setValueAtTime(master.gain.value || 0.0001, audioCtx.currentTime);
+      master.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 2);
+      tocarCompas();
+      loopId = setInterval(tocarCompas, 4000);
+    } else {
+      sonando = false;
+      this.classList.remove('on');
+      master.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+      clearInterval(loopId);
+    }
+  });
+
+  // evitar el zoom por doble toque en iOS
+  let ultimoToque = 0;
+  document.addEventListener('touchend', e => {
+    const ahora = Date.now();
+    if (ahora - ultimoToque < 320) e.preventDefault();
+    ultimoToque = ahora;
+  }, { passive: false });
+
+})();
+</script>
+</body>
+</html>
