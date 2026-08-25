@@ -566,10 +566,12 @@ p.parrafo strong{font-weight:600;color:var(--acento);}
 .sticker.centro.lado-izq{margin-left:clamp(6px,4vw,34px);margin-right:auto;}
 .sticker.centro.lado-der{margin-right:clamp(6px,4vw,34px);margin-left:auto;}
 
-/* los que se asoman por el borde de la hoja */
+/* Los que se asoman por el borde de la hoja.
+   z-index negativo: quedan por encima del papel pero POR DEBAJO del texto,
+   así nunca tapan una línea aunque se metan un poco. */
 .sticker.pegado{
   position:absolute;
-  z-index:6;
+  z-index:-1;
 }
 
 /* --- los movimientos, según lo que esté haciendo cada uno --- */
@@ -947,27 +949,27 @@ const CARTA = {
       quien:"Hello Kitty con la letra de diamantes" },
 
     // --- los pequeños, asomándose por los bordes ---
-    { img:"img/melody-acostada.png",      mov:"st-dormir", en:"der", y:"6%",  tam:86, giro: 6,
+    { img:"img/melody-acostada.png",      mov:"st-dormir", en:"der", y:"6%",  tam:72, giro: 6,
       quien:"My Melody con las manitas en la cara" },
-    { img:"img/cinnamoroll-cafe.png",     mov:"st-beber",  en:"izq", y:"14%", tam:90, giro:-6,
+    { img:"img/cinnamoroll-cafe.png",     mov:"st-beber",  en:"izq", y:"14%", tam:76, giro:-6,
       quien:"Cinnamoroll con su bebida" },
-    { img:"img/pompompurin-cafe.png",     mov:"st-beber",  en:"der", y:"22%", tam:86, giro: 5,
+    { img:"img/pompompurin-cafe.png",     mov:"st-beber",  en:"der", y:"22%", tam:72, giro: 5,
       quien:"Pompompurin con su bubble tea" },
-    { img:"img/pochacco-sabritas.png",    mov:"st-brinco", en:"izq", y:"30%", tam:88, giro:-5,
+    { img:"img/pochacco-sabritas.png",    mov:"st-brinco", en:"izq", y:"30%", tam:74, giro:-5,
       quien:"Pochacco con su bolsa de snacks" },
-    { img:"img/melody-papitas.png",       mov:"st-cargar", en:"der", y:"39%", tam:86, giro: 6,
+    { img:"img/melody-papitas.png",       mov:"st-cargar", en:"der", y:"39%", tam:72, giro: 6,
       quien:"My Melody cargando las fresas" },
-    { img:"img/keroppi-cafe.png",         mov:"st-beber",  en:"izq", y:"47%", tam:90, giro:-6,
+    { img:"img/keroppi-cafe.png",         mov:"st-beber",  en:"izq", y:"47%", tam:76, giro:-6,
       quien:"Keroppi con su bebida verde" },
-    { img:"img/cinnamoroll-sabritas.png", mov:"st-cargar", en:"der", y:"55%", tam:88, giro: 5,
+    { img:"img/cinnamoroll-sabritas.png", mov:"st-cargar", en:"der", y:"55%", tam:74, giro: 5,
       quien:"Cinnamoroll cargando su bolsa" },
-    { img:"img/badtz-hamburguesa.png",    mov:"st-comer",  en:"izq", y:"63%", tam:86, giro:-5,
+    { img:"img/badtz-hamburguesa.png",    mov:"st-comer",  en:"izq", y:"63%", tam:72, giro:-5,
       quien:"Badtz-Maru con su hamburguesa" },
-    { img:"img/melody-pastel.png",        mov:"st-comer",  en:"der", y:"71%", tam:86, giro: 6,
+    { img:"img/melody-pastel.png",        mov:"st-comer",  en:"der", y:"71%", tam:72, giro: 6,
       quien:"My Melody con su cupcake de fresa" },
-    { img:"img/pompompurin-mufin.png",    mov:"st-comer",  en:"izq", y:"79%", tam:86, giro:-6,
+    { img:"img/pompompurin-mufin.png",    mov:"st-comer",  en:"izq", y:"79%", tam:72, giro:-6,
       quien:"Pompompurin con su flan" },
-    { img:"img/cinnamoroll-pastel.png",   mov:"st-comer",  en:"der", y:"88%", tam:90, giro: 5,
+    { img:"img/cinnamoroll-pastel.png",   mov:"st-comer",  en:"der", y:"88%", tam:76, giro: 5,
       quien:"Cinnamoroll con el pastel de fresa" }
   ],
 
@@ -1268,7 +1270,9 @@ const CARTA = {
       if (s.en === 'izq' || s.en === 'der'){
         caja.classList.add('pegado');
         caja.style.top = s.y || '20%';
-        const fuera = 'calc(-' + (s.tam || 88) + 'px * 0.4)';
+        // se sale casi todo del papel: lo poco que entra cae en el margen,
+        // donde no hay texto que estorbar
+        const fuera = 'calc(-' + (s.tam || 88) + 'px * 0.72)';
         if (s.en === 'izq') caja.style.left  = fuera;
         else                caja.style.right = fuera;
         hoja.appendChild(caja);
