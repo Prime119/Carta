@@ -237,14 +237,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
 
 .sello{
   position:absolute;left:50%;top:46%;
-  width:23%;aspect-ratio:1;
+  width:31%;aspect-ratio:1;
   transform:translate(-50%,-50%);
-  border-radius:50%;
-  box-shadow:0 4px 12px rgba(0,0,0,.4), 0 0 0 1px rgba(120,10,30,.25);
   z-index:6;
+  /* la sombra sigue la silueta de la flor, no un cuadro ni un círculo */
+  filter:drop-shadow(0 5px 11px rgba(0,0,0,.45));
   transition:opacity .35s ease .1s, transform .5s ease;
 }
-.sello svg{display:block;width:100%;height:100%;border-radius:50%;}
+.sello svg{display:block;width:100%;height:100%;}
 .sobre.abierto .sello{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(30deg);}
 
 /* figuritas que acompañan al sobre en la portada */
@@ -690,42 +690,54 @@ p.parrafo strong{font-weight:600;color:var(--acento);}
       <div class="sello" id="sello">
         <svg viewBox="0 0 100 100" aria-hidden="true">
           <defs>
-            <radialGradient id="ceraRosa" cx="36%" cy="30%" r="74%">
-              <stop offset="0%"   stop-color="#e35068"/>
-              <stop offset="48%"  stop-color="#c11a38"/>
-              <stop offset="100%" stop-color="#770c1f"/>
+            <radialGradient id="petaloFuera" cx="50%" cy="72%" r="78%">
+              <stop offset="0%"   stop-color="#c4173a"/>
+              <stop offset="60%"  stop-color="#a01029"/>
+              <stop offset="100%" stop-color="#6e0817"/>
+            </radialGradient>
+            <radialGradient id="petaloMedio" cx="50%" cy="80%" r="80%">
+              <stop offset="0%"   stop-color="#e04058"/>
+              <stop offset="65%"  stop-color="#bb1839"/>
+              <stop offset="100%" stop-color="#8a0e22"/>
+            </radialGradient>
+            <radialGradient id="corazonRosa" cx="38%" cy="32%" r="76%">
+              <stop offset="0%"   stop-color="#ec5f74"/>
+              <stop offset="55%"  stop-color="#c01935"/>
+              <stop offset="100%" stop-color="#8c0f22"/>
             </radialGradient>
           </defs>
 
-          <circle cx="50" cy="50" r="49" fill="url(#ceraRosa)"/>
-
-          <!-- pétalos de fuera -->
-          <g fill="#8f0f26" opacity=".42">
-            <ellipse cx="50" cy="17" rx="16" ry="11"/>
-            <ellipse cx="73" cy="27" rx="16" ry="11" transform="rotate(45 73 27)"/>
-            <ellipse cx="83" cy="50" rx="16" ry="11" transform="rotate(90 83 50)"/>
-            <ellipse cx="73" cy="73" rx="16" ry="11" transform="rotate(135 73 73)"/>
-            <ellipse cx="50" cy="83" rx="16" ry="11"/>
-            <ellipse cx="27" cy="73" rx="16" ry="11" transform="rotate(45 27 73)"/>
-            <ellipse cx="17" cy="50" rx="16" ry="11" transform="rotate(90 17 50)"/>
-            <ellipse cx="27" cy="27" rx="16" ry="11" transform="rotate(135 27 27)"/>
+          <!-- corona de fuera: 8 pétalos abiertos -->
+          <g fill="url(#petaloFuera)" stroke="#5f0714" stroke-width=".7" stroke-linejoin="round">
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(45 50 50)"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(90 50 50)"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(135 50 50)"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(180 50 50)"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(225 50 50)"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(270 50 50)"/>
+            <path d="M50 34 C 33 29, 27 11, 50 3 C 73 11, 67 29, 50 34 Z" transform="rotate(315 50 50)"/>
           </g>
 
-          <!-- pétalos de dentro -->
-          <g fill="#dd4159" opacity=".45">
-            <ellipse cx="50" cy="31" rx="12" ry="8"/>
-            <ellipse cx="67" cy="50" rx="12" ry="8" transform="rotate(90 67 50)"/>
-            <ellipse cx="50" cy="69" rx="12" ry="8"/>
-            <ellipse cx="33" cy="50" rx="12" ry="8" transform="rotate(90 33 50)"/>
+          <!-- corona de en medio: intercalada con la de fuera -->
+          <g fill="url(#petaloMedio)" stroke="#6d0a1a" stroke-width=".6" stroke-linejoin="round">
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(22.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(67.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(112.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(157.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(202.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(247.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(292.5 50 50)"/>
+            <path d="M50 40 C 38 36, 33 21, 50 13 C 67 21, 62 36, 50 40 Z" transform="rotate(337.5 50 50)"/>
           </g>
 
-          <!-- brillo de la cera -->
-          <ellipse cx="35" cy="30" rx="17" ry="11" fill="#fff" opacity=".13"
-                   transform="rotate(-32 35 30)"/>
+          <!-- el capullo, donde van las iniciales -->
+          <circle cx="50" cy="50" r="19" fill="url(#corazonRosa)" stroke="#7d0c1e" stroke-width=".8"/>
+          <ellipse cx="43" cy="42" rx="9" ry="6" fill="#fff" opacity=".15" transform="rotate(-30 43 42)"/>
 
-          <text id="sello-texto" x="50" y="61" text-anchor="middle"
+          <text id="sello-texto" x="50" y="57" text-anchor="middle"
                 font-family="Cormorant Garamond, Georgia, serif"
-                font-size="34" font-weight="600" letter-spacing="1"
+                font-size="20" font-weight="600" letter-spacing=".5"
                 fill="#f8e3b6">PH</text>
         </svg>
       </div>
@@ -1538,6 +1550,8 @@ const CARTA = {
     vibrar(12);
 
     // El toque de ella es el gesto que iOS exige para dejar sonar el audio.
+    // Cada vez que abre la carta, la canción empieza desde el principio.
+    rebobinarCancion();
     arrancarMusica();
 
     agendar(() => {
@@ -1583,6 +1597,10 @@ const CARTA = {
     pendientes.forEach(clearTimeout);
     pendientes = [];
     if (soltarNumeros) soltarNumeros();
+
+    // la canción se calla y vuelve al principio
+    pararMusica();
+    rebobinarCancion();
 
     vibrar(10);
     window.scrollTo(0, 0);
@@ -1804,6 +1822,11 @@ const CARTA = {
   function pararMusica(){
     try { audio.pause(); } catch(e){}
     marcar(false);
+  }
+
+  // deja la canción lista para volver a empezar desde el principio
+  function rebobinarCancion(){
+    try { audio.currentTime = 0; } catch(e){}
   }
 
   // por si el bucle fallara en algún navegador
