@@ -53,7 +53,9 @@
 html{
   height:100%;
   overflow-x:hidden;
+  overflow-x:clip;        /* "clip" no crea barra lateral; el de arriba es el respaldo */
   overflow-y:hidden;
+  overscroll-behavior-x:none;
 }
 html.leyendo{
   overflow-y:auto;
@@ -70,7 +72,14 @@ html,body{
   overscroll-behavior:none;
 }
 
-body{min-height:100%;}
+body{
+  min-height:100%;
+  overflow-x:hidden;
+  overflow-x:clip;
+  /* el dedo solo mueve la carta hacia arriba y abajo, nunca de lado */
+  touch-action:pan-y;
+  overscroll-behavior-x:none;
+}
 
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
 
@@ -1000,6 +1009,10 @@ const CARTA = {
   tu:          "Gabriel",   // ← tu nombre (va en la firma, con letra manuscrita)
   inicialSello:"PH",        // ← las iniciales del sello de cera (la rosa roja)
 
+  // La fecha que sale arriba de la carta, siempre la misma.
+  // Si lo dejas vacío ("") pondrá la del día en que ella la abra.
+  fecha:       "25 de agosto de 2026",
+
   // --- Las fechas de ustedes ---
   // Los días se calculan solos hasta el día en que ella abra la carta. Mes: 1 = enero.
   hitos: [
@@ -1565,7 +1578,10 @@ const CARTA = {
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio',
                  'agosto','septiembre','octubre','noviembre','diciembre'];
   const hoy = new Date();
-  $('#fecha-hoy').textContent = hoy.getDate() + ' de ' + meses[hoy.getMonth()] + ' de ' + hoy.getFullYear();
+  // la fecha de la carta: la que pusiste, o la del día si la dejaste vacía
+  $('#fecha-hoy').textContent = (CARTA.fecha && CARTA.fecha.trim())
+    ? CARTA.fecha
+    : hoy.getDate() + ' de ' + meses[hoy.getMonth()] + ' de ' + hoy.getFullYear();
 
   function diasDesde(h){
     const d0 = new Date(h.anio, h.mes - 1, h.dia);
@@ -1604,27 +1620,33 @@ const CARTA = {
      ============================================================ */
   const canvas = $('#cielo');
   const ctx = canvas.getContext('2d', { alpha: false });
-  let estrellas = [], fugaz = null, ancho = 0, alto = 0, animando = true;
+  let estrellas = [], fugaz = null, ancho = 0, alto = 0, altoLienzo = 0, animando = true;
 
   function dimensionar(){
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
     ancho = vw();
-    alto  = vh();
+    alto  = vh();              // el alto de verdad, para comparar
+
+    // el lienzo se hace más alto a propósito: cuando Safari esconde su barra
+    // la pantalla crece, y así no aparece una franja vacía abajo
+    altoLienzo = alto + 160;
+
     canvas.width  = Math.floor(ancho * dpr);
-    canvas.height = Math.floor(alto * dpr);
+    canvas.height = Math.floor(altoLienzo * dpr);
     canvas.style.width  = ancho + 'px';
-    canvas.style.height = alto + 'px';
+    canvas.style.height = altoLienzo + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     crearEstrellas();
   }
 
   function crearEstrellas(){
-    const cantidad = Math.round(Math.min(180, (ancho * alto) / 5600));
+    const cantidad = Math.round(Math.min(180, (ancho * altoLienzo) / 5600));
     estrellas = [];
     for (let i = 0; i < cantidad; i++){
       estrellas.push({
         x: Math.random() * ancho,
-        y: Math.random() * alto,
+        y: Math.random() * altoLienzo,
         r: Math.random() * 1.25 + 0.25,
         base: Math.random() * 0.5 + 0.25,
         vel: Math.random() * 0.014 + 0.004,
@@ -1650,14 +1672,18 @@ const CARTA = {
     if (!animando) return;
     t += 0.016;
 
-    if (vw() !== ancho || vh() !== alto) dimensionar();
+    // OJO: en iPhone, al deslizar, Safari esconde y saca la barra de direcciones
+    // y eso cambia la altura de la ventana. Si redibujáramos por cada cambio,
+    // el cielo daría un tirón en cada scroll. Solo se rehace si gira el
+    // teléfono (cambia el ancho) o si el alto cambia muchísimo.
+    if (Math.abs(vw() - ancho) > 2 || Math.abs(vh() - alto) > 140) dimensionar();
 
-    const g = ctx.createLinearGradient(0, 0, 0, alto);
+    const g = ctx.createLinearGradient(0, 0, 0, altoLienzo);
     g.addColorStop(0, '#221033');
     g.addColorStop(0.55, '#150a1c');
     g.addColorStop(1, '#0d0512');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, ancho, alto);
+    ctx.fillRect(0, 0, ancho, altoLienzo);
 
     for (let i = 0; i < estrellas.length; i++){
       const e = estrellas[i];
@@ -1698,7 +1724,11 @@ const CARTA = {
 
   dimensionar();
   dibujar();
-  window.addEventListener('resize', dimensionar);
+
+  // el mismo filtro que arriba: la barra de Safari también dispara "resize"
+  window.addEventListener('resize', () => {
+    if (Math.abs(vw() - ancho) > 2 || Math.abs(vh() - alto) > 140) dimensionar();
+  });
   window.addEventListener('orientationchange', () => setTimeout(dimensionar, 250));
 
   setInterval(() => { if (!fugaz && Math.random() > 0.45) lanzarFugaz(); }, 5200);
@@ -1923,7 +1953,7 @@ const CARTA = {
 
     if (menosMovimiento){ window.scrollTo(0, tope); return; }
 
-    const dur = 900, t0 = performance.now();
+    const dur = 420, t0 = performance.now();
     (function paso(ahora){
       const p = Math.min(1, (ahora - t0) / dur);
       const suave = 1 - Math.pow(1 - p, 3);
@@ -1942,10 +1972,10 @@ const CARTA = {
     fuegosArtificiales();
     lluviaDeCorazones();
 
-    // la carta baja sola para que se lea todo el mensaje mientras aparece
-    agendar(() => bajarHasta(resp, 30), 450);
-    agendar(() => bajarHasta(resp, 30), 1600);
-    agendar(() => bajarHasta($('.acciones'), 30), 2900);
+    // la carta baja sola, y rápido, para que se lea el mensaje mientras aparece
+    agendar(() => bajarHasta(resp, 30), 180);
+    agendar(() => bajarHasta(resp, 30), 900);
+    agendar(() => bajarHasta($('.acciones'), 30), 1900);
   });
 
   $('#btn-cerrar').addEventListener('click', cerrar);
