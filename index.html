@@ -237,18 +237,14 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;}
 
 .sello{
   position:absolute;left:50%;top:46%;
-  width:19%;aspect-ratio:1;
+  width:23%;aspect-ratio:1;
   transform:translate(-50%,-50%);
   border-radius:50%;
-  background:radial-gradient(circle at 34% 30%, #f087b0 0%, #d2447c 60%, #a82a5c 100%);
-  box-shadow:0 3px 9px rgba(0,0,0,.35), inset 0 -2px 6px rgba(0,0,0,.28);
+  box-shadow:0 4px 12px rgba(0,0,0,.4), 0 0 0 1px rgba(120,10,30,.25);
   z-index:6;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);
-  font-size:clamp(.8rem,3.4vw,1.05rem);
-  color:rgba(255,255,255,.95);letter-spacing:.06em;
   transition:opacity .35s ease .1s, transform .5s ease;
 }
+.sello svg{display:block;width:100%;height:100%;border-radius:50%;}
 .sobre.abierto .sello{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(30deg);}
 
 /* figuritas que acompañan al sobre en la portada */
@@ -544,87 +540,119 @@ p.parrafo strong{font-weight:600;color:var(--acento);}
 }
 
 /* ============================================================
-   LÁMINAS · las fotos de sus personajes
-   Cada una se mueve distinto, según quién sea.
+   STICKERS · cada personaje, recortado de su viñeta
+   El recorte se hace aquí, con la imagen dentro de una ventana
+   redonda: no hace falta editar ninguna foto.
    ============================================================ */
-.lamina{
+.sticker{
+  position:relative;
   display:block;
-  width:min(80%,300px);
-  margin:clamp(30px,7vw,48px) auto;
-  padding:8px;
-  background:#fff;
-  border:1px solid var(--papel-borde);
-  border-radius:16px;
-  box-shadow:0 12px 28px rgba(120,30,70,.22), 0 2px 6px rgba(120,30,70,.12);
   will-change:transform;
 }
-.lamina img{
-  display:block;width:100%;height:auto;
-  border-radius:10px;
-  background:#fdf3f7;
+.sticker img{
+  display:block;
+  width:100%;
+  height:auto;
+  filter:drop-shadow(0 9px 18px rgba(120,30,70,.3));
+  opacity:0;
+  transition:opacity .6s ease;
+}
+.sticker img.puesta{opacity:1;}
+
+/* los que van entre el texto */
+.sticker.centro{
+  margin:clamp(26px,6vw,40px) auto;
+}
+.sticker.centro.lado-izq{margin-left:clamp(6px,4vw,34px);margin-right:auto;}
+.sticker.centro.lado-der{margin-right:clamp(6px,4vw,34px);margin-left:auto;}
+
+/* los que se asoman por el borde de la hoja */
+.sticker.pegado{
+  position:absolute;
+  z-index:6;
 }
 
-/* Badtz-Maru: pasota, se balancea sin ganas */
-.mov-cool{animation:mov-cool 6.5s ease-in-out infinite;}
-@keyframes mov-cool{
-  0%,100%{transform:rotate(var(--base,0deg)) translateY(0);}
-  50%{transform:rotate(calc(var(--base,0deg) + 1.6deg)) translateY(-7px);}
+/* --- los movimientos, según lo que esté haciendo cada uno --- */
+
+/* ballet: la pirueta */
+.st-ballet{animation:st-ballet 7s ease-in-out infinite;}
+@keyframes st-ballet{
+  0%,100%{transform:rotate(var(--base,0deg)) translateY(0) scale(1);}
+  25%{transform:rotate(calc(var(--base,0deg) + 8deg)) translateY(-11px) scale(1.03);}
+  50%{transform:rotate(var(--base,0deg)) translateY(-15px) scale(1.05);}
+  75%{transform:rotate(calc(var(--base,0deg) - 8deg)) translateY(-11px) scale(1.03);}
 }
 
-/* Pochacco: juguetón, rebota */
-.mov-brinco{animation:mov-brinco 3.6s ease-in-out infinite;}
-@keyframes mov-brinco{
-  0%,60%,100%{transform:rotate(var(--base,0deg)) translateY(0) scaleY(1);}
-  15%{transform:rotate(var(--base,0deg)) translateY(-15px) scaleY(1.03);}
-  30%{transform:rotate(var(--base,0deg)) translateY(0) scaleY(.97);}
-  45%{transform:rotate(var(--base,0deg)) translateY(-7px) scaleY(1.01);}
+/* tomar: echa la cabeza atrás y sorbe */
+.st-beber{animation:st-beber 4.5s ease-in-out infinite;}
+@keyframes st-beber{
+  0%,52%,100%{transform:rotate(var(--base,0deg)) translateY(0);}
+  68%{transform:rotate(calc(var(--base,0deg) - 10deg)) translateY(-5px);}
+  84%{transform:rotate(calc(var(--base,0deg) - 5deg)) translateY(-2px);}
 }
 
-/* Pompompurin: dormilón, solo respira */
-.mov-respira{animation:mov-respira 7s ease-in-out infinite;}
-@keyframes mov-respira{
+/* comer: el mordisco */
+.st-comer{animation:st-comer 3.4s ease-in-out infinite;}
+@keyframes st-comer{
+  0%,42%,100%{transform:rotate(var(--base,0deg)) scale(1);}
+  54%{transform:rotate(var(--base,0deg)) scale(1.08);}
+  64%{transform:rotate(var(--base,0deg)) scale(.97);}
+  76%{transform:rotate(var(--base,0deg)) scale(1.05);}
+}
+
+/* cargar: le pesa la bolsa y se balancea */
+.st-cargar{animation:st-cargar 5s ease-in-out infinite;}
+@keyframes st-cargar{
+  0%,100%{transform:rotate(calc(var(--base,0deg) - 5deg)) translateY(0);}
+  50%{transform:rotate(calc(var(--base,0deg) + 5deg)) translateY(-6px);}
+}
+
+/* echado: solo respira */
+.st-dormir{animation:st-dormir 6.5s ease-in-out infinite;}
+@keyframes st-dormir{
   0%,100%{transform:rotate(var(--base,0deg)) scale(1);}
-  50%{transform:rotate(var(--base,0deg)) scale(1.04);}
+  50%{transform:rotate(var(--base,0deg)) scale(1.05);}
 }
 
-/* Keroppi: es una rana, salta */
-.mov-salto{animation:mov-salto 4.2s ease-in-out infinite;}
-@keyframes mov-salto{
-  0%,55%,100%{transform:rotate(var(--base,0deg)) translateY(0) scale(1,1);}
-  62%{transform:rotate(var(--base,0deg)) translateY(0) scale(1.07,.9);}
-  74%{transform:rotate(var(--base,0deg)) translateY(-24px) scale(.94,1.08);}
-  88%{transform:rotate(var(--base,0deg)) translateY(0) scale(1.05,.95);}
+/* saltar: como la rana que es */
+.st-saltar{animation:st-saltar 4s ease-in-out infinite;}
+@keyframes st-saltar{
+  0%,50%,100%{transform:rotate(var(--base,0deg)) translateY(0) scale(1,1);}
+  58%{transform:rotate(var(--base,0deg)) translateY(0) scale(1.09,.89);}
+  70%{transform:rotate(var(--base,0deg)) translateY(-28px) scale(.92,1.1);}
+  86%{transform:rotate(var(--base,0deg)) translateY(0) scale(1.07,.93);}
 }
 
-/* Cinnamoroll: vuela con las orejas, va a la deriva */
-.mov-vuela{animation:mov-vuela 9s ease-in-out infinite;}
-@keyframes mov-vuela{
+/* deslizarse: pasa de un lado a otro */
+.st-desliza{animation:st-desliza 8s ease-in-out infinite;}
+@keyframes st-desliza{
+  0%{transform:rotate(calc(var(--base,0deg) - 3deg)) translateX(-28px);}
+  50%{transform:rotate(calc(var(--base,0deg) + 3deg)) translateX(28px);}
+  100%{transform:rotate(calc(var(--base,0deg) - 3deg)) translateX(-28px);}
+}
+
+/* flotar: el que va en la nube */
+.st-flotar{animation:st-flotar 9s ease-in-out infinite;}
+@keyframes st-flotar{
   0%,100%{transform:rotate(var(--base,0deg)) translate(0,0);}
-  33%{transform:rotate(calc(var(--base,0deg) - 1.4deg)) translate(-9px,-13px);}
-  66%{transform:rotate(calc(var(--base,0deg) + 1.4deg)) translate(9px,-6px);}
+  33%{transform:rotate(calc(var(--base,0deg) - 4deg)) translate(-10px,-14px);}
+  66%{transform:rotate(calc(var(--base,0deg) + 4deg)) translate(10px,-7px);}
 }
 
-/* My Melody: dulce, se mece */
-.mov-mece{animation:mov-mece 5.4s ease-in-out infinite;}
-@keyframes mov-mece{
-  0%,100%{transform:rotate(calc(var(--base,0deg) - 2.2deg));}
-  50%{transform:rotate(calc(var(--base,0deg) + 2.2deg));}
+/* brincar: el juguetón */
+.st-brinco{animation:st-brinco 3.6s ease-in-out infinite;}
+@keyframes st-brinco{
+  0%,60%,100%{transform:rotate(var(--base,0deg)) translateY(0) scaleY(1);}
+  15%{transform:rotate(var(--base,0deg)) translateY(-16px) scaleY(1.04);}
+  30%{transform:rotate(var(--base,0deg)) translateY(0) scaleY(.96);}
+  45%{transform:rotate(var(--base,0deg)) translateY(-8px) scaleY(1.02);}
 }
 
-/* Kitty bailarina: da su pirueta */
-.mov-pirueta{animation:mov-pirueta 8s ease-in-out infinite;}
-@keyframes mov-pirueta{
-  0%,100%{transform:rotate(var(--base,0deg)) scale(1) translateY(0);}
-  25%{transform:rotate(calc(var(--base,0deg) + 3deg)) scale(1.02) translateY(-9px);}
-  50%{transform:rotate(var(--base,0deg)) scale(1.045) translateY(-13px);}
-  75%{transform:rotate(calc(var(--base,0deg) - 3deg)) scale(1.02) translateY(-9px);}
-}
-
-/* Kitty con la letra: brilla, que para eso tiene diamantes */
-.mov-brilla{animation:mov-brilla 6s ease-in-out infinite;}
-@keyframes mov-brilla{
+/* brillar: la de los diamantes */
+.st-brilla{animation:st-brilla 5.5s ease-in-out infinite;}
+@keyframes st-brilla{
   0%,100%{transform:rotate(var(--base,0deg)) scale(1);filter:brightness(1);}
-  50%{transform:rotate(var(--base,0deg)) scale(1.03);filter:brightness(1.12) saturate(1.08);}
+  50%{transform:rotate(var(--base,0deg)) scale(1.05);filter:brightness(1.14) saturate(1.1);}
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -657,7 +685,50 @@ p.parrafo strong{font-weight:600;color:var(--acento);}
       <div class="hoja-mini"></div>
       <div class="sobre-frente"></div>
       <div class="solapa"></div>
-      <div class="sello" id="sello">♡</div>
+
+      <!-- sello de cera: una rosa roja con las iniciales -->
+      <div class="sello" id="sello">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <radialGradient id="ceraRosa" cx="36%" cy="30%" r="74%">
+              <stop offset="0%"   stop-color="#e35068"/>
+              <stop offset="48%"  stop-color="#c11a38"/>
+              <stop offset="100%" stop-color="#770c1f"/>
+            </radialGradient>
+          </defs>
+
+          <circle cx="50" cy="50" r="49" fill="url(#ceraRosa)"/>
+
+          <!-- pétalos de fuera -->
+          <g fill="#8f0f26" opacity=".42">
+            <ellipse cx="50" cy="17" rx="16" ry="11"/>
+            <ellipse cx="73" cy="27" rx="16" ry="11" transform="rotate(45 73 27)"/>
+            <ellipse cx="83" cy="50" rx="16" ry="11" transform="rotate(90 83 50)"/>
+            <ellipse cx="73" cy="73" rx="16" ry="11" transform="rotate(135 73 73)"/>
+            <ellipse cx="50" cy="83" rx="16" ry="11"/>
+            <ellipse cx="27" cy="73" rx="16" ry="11" transform="rotate(45 27 73)"/>
+            <ellipse cx="17" cy="50" rx="16" ry="11" transform="rotate(90 17 50)"/>
+            <ellipse cx="27" cy="27" rx="16" ry="11" transform="rotate(135 27 27)"/>
+          </g>
+
+          <!-- pétalos de dentro -->
+          <g fill="#dd4159" opacity=".45">
+            <ellipse cx="50" cy="31" rx="12" ry="8"/>
+            <ellipse cx="67" cy="50" rx="12" ry="8" transform="rotate(90 67 50)"/>
+            <ellipse cx="50" cy="69" rx="12" ry="8"/>
+            <ellipse cx="33" cy="50" rx="12" ry="8" transform="rotate(90 33 50)"/>
+          </g>
+
+          <!-- brillo de la cera -->
+          <ellipse cx="35" cy="30" rx="17" ry="11" fill="#fff" opacity=".13"
+                   transform="rotate(-32 35 30)"/>
+
+          <text id="sello-texto" x="50" y="61" text-anchor="middle"
+                font-family="Cormorant Garamond, Georgia, serif"
+                font-size="34" font-weight="600" letter-spacing="1"
+                fill="#f8e3b6">PH</text>
+        </svg>
+      </div>
     </div>
   </div>
 
@@ -737,7 +808,7 @@ p.parrafo strong{font-weight:600;color:var(--acento);}
     <button class="btn principal" id="btn-perdon"></button>
     <div class="respuesta" id="respuesta"></div>
     <a class="btn tenue" id="btn-responder" href="#" style="display:none">Escríbeme</a>
-    <button class="btn tenue" id="btn-otra">Leerla otra vez</button>
+    <button class="btn tenue" id="btn-cerrar">Cerrar carta</button>
   </div>
 
 </article>
@@ -751,7 +822,7 @@ const CARTA = {
   // --- Nombres ---
   ella:        "Mi amor",   // ← el nombre de ella
   tu:          "Gabriel",   // ← tu nombre (va en la firma, con letra manuscrita)
-  inicialSello:"♡",         // ← lo que va en el sello de cera: una letra o un símbolo
+  inicialSello:"PH",        // ← las iniciales del sello de cera (la rosa roja)
 
   // --- Las fechas de ustedes ---
   // Los días se calculan solos hasta el día en que ella abra la carta. Mes: 1 = enero.
@@ -832,21 +903,60 @@ const CARTA = {
      Déjalo vacío ("") si prefieres que no haya música.  */
   cancion: "img/FRANKY STYLE - PUCCA.mp3",
 
-  /* --- LAS FOTOS ---
-     Van repartidas por toda la carta, cada una debajo de un trozo de texto.
-     "mov" es cómo se mueve: mov-cool, mov-brinco, mov-respira, mov-salto,
-     mov-vuela, mov-mece, mov-pirueta o mov-brilla.
-     "giro" es la inclinación, para que parezcan fotos pegadas.
-     Para cambiar el orden, solo mueve las líneas de sitio.  */
-  laminas: [
-    { src:"img/descarga (6).jpg", mov:"mov-pirueta", giro:-2,   quien:"Hello Kitty bailarina" },
-    { src:"img/descarga (5).jpg", mov:"mov-mece",    giro: 2,   quien:"My Melody" },
-    { src:"img/descarga (4).jpg", mov:"mov-vuela",   giro:-1.5, quien:"Cinnamoroll" },
-    { src:"img/descarga (1).jpg", mov:"mov-brinco",  giro: 1.5, quien:"Pochacco" },
-    { src:"img/descarga (2).jpg", mov:"mov-respira", giro:-2,   quien:"Pompompurin" },
-    { src:"img/descarga (3).jpg", mov:"mov-salto",   giro: 2,   quien:"Keroppi" },
-    { src:"img/descarga.jpg",     mov:"mov-cool",    giro:-1.5, quien:"Badtz-Maru" },
-    { src:"img/descarga (7).jpg", mov:"mov-brilla",  giro: 1.5, quien:"Hello Kitty" }
+  /* --- LOS STICKERS ---
+     Cada uno se mueve haciendo lo que hace en su dibujo:
+     bailar, beber, comer, cargar, saltar, brincar, deslizarse...
+
+     mov: st-ballet, st-beber, st-comer, st-cargar, st-dormir, st-saltar,
+          st-brinco, st-desliza, st-flotar o st-brilla.
+     en:  "p1" a "p8" para que vaya entre el texto,
+          "izq" o "der" para que se asome por el borde de la hoja
+          (con "y" a qué altura).
+     tam: el tamaño en píxeles.  giro: la inclinación.
+     Para quitar uno, borra su línea. Para cambiarle el movimiento,
+     cambia el nombre de "mov".                                        */
+  stickers: [
+    // --- los grandes, entre el texto ---
+    { img:"img/kitty-ballet.png",         mov:"st-ballet",  en:"p1", tam:150, giro:-3,
+      quien:"Hello Kitty haciendo ballet" },
+    { img:"img/melody-cafe.png",          mov:"st-beber",   en:"p2", tam:130, giro: 4, lado:"der",
+      quien:"My Melody tomando su bebida de fresa" },
+    { img:"img/cinnamoroll-nube.png",     mov:"st-flotar",  en:"p3", tam:150, giro:-4, lado:"izq",
+      quien:"Cinnamoroll en su nube" },
+    { img:"img/pochacco-sandwich.png",    mov:"st-comer",   en:"p4", tam:140, giro: 3, lado:"der",
+      quien:"Pochacco comiéndose el sándwich" },
+    { img:"img/pompompurin-sabritas.png", mov:"st-cargar",  en:"p5", tam:135, giro:-3, lado:"izq",
+      quien:"Pompompurin cargando su pudding cake" },
+    { img:"img/keroppi-hotcakes.png",     mov:"st-saltar",  en:"p6", tam:140, giro: 3, lado:"der",
+      quien:"Keroppi con su hamburguesa" },
+    { img:"img/badtz-cafe.png",           mov:"st-desliza", en:"p7", tam:130, giro:-3, lado:"izq",
+      quien:"Badtz-Maru con su bubble tea" },
+    { img:"img/kitty-letra.png",          mov:"st-brilla",  en:"p8", tam:150, giro: 3,
+      quien:"Hello Kitty con la letra de diamantes" },
+
+    // --- los pequeños, asomándose por los bordes ---
+    { img:"img/melody-acostada.png",      mov:"st-dormir", en:"der", y:"6%",  tam:86, giro: 6,
+      quien:"My Melody con las manitas en la cara" },
+    { img:"img/cinnamoroll-cafe.png",     mov:"st-beber",  en:"izq", y:"14%", tam:90, giro:-6,
+      quien:"Cinnamoroll con su bebida" },
+    { img:"img/pompompurin-cafe.png",     mov:"st-beber",  en:"der", y:"22%", tam:86, giro: 5,
+      quien:"Pompompurin con su bubble tea" },
+    { img:"img/pochacco-sabritas.png",    mov:"st-brinco", en:"izq", y:"30%", tam:88, giro:-5,
+      quien:"Pochacco con su bolsa de snacks" },
+    { img:"img/melody-papitas.png",       mov:"st-cargar", en:"der", y:"39%", tam:86, giro: 6,
+      quien:"My Melody cargando las fresas" },
+    { img:"img/keroppi-cafe.png",         mov:"st-beber",  en:"izq", y:"47%", tam:90, giro:-6,
+      quien:"Keroppi con su bebida verde" },
+    { img:"img/cinnamoroll-sabritas.png", mov:"st-cargar", en:"der", y:"55%", tam:88, giro: 5,
+      quien:"Cinnamoroll cargando su bolsa" },
+    { img:"img/badtz-hamburguesa.png",    mov:"st-comer",  en:"izq", y:"63%", tam:86, giro:-5,
+      quien:"Badtz-Maru con su hamburguesa" },
+    { img:"img/melody-pastel.png",        mov:"st-comer",  en:"der", y:"71%", tam:86, giro: 6,
+      quien:"My Melody con su cupcake de fresa" },
+    { img:"img/pompompurin-mufin.png",    mov:"st-comer",  en:"izq", y:"79%", tam:86, giro:-6,
+      quien:"Pompompurin con su flan" },
+    { img:"img/cinnamoroll-pastel.png",   mov:"st-comer",  en:"der", y:"88%", tam:90, giro: 5,
+      quien:"Cinnamoroll con el pastel de fresa" }
   ],
 
   /* --- Figuritas flotantes ---
@@ -1059,16 +1169,13 @@ const CARTA = {
     { fig:'cupcake',    col:ROSA,   x:'10%', y:'96%', tam:42, prof:.22, rot:5,   dur:6.1, del:1.1 }
   ];
 
-  /* --- las que se asoman por el borde del papel --- */
+  /* --- las que se asoman por el borde del papel ---
+     Pocas y pequeñas: el borde es ahora sitio de los stickers. */
   const BORDES = [
-    { fig:'gato',     col:BLANCO, lado:'izq', y:'6%',  tam:56, rot:-10, dur:6.2, del:.2 },
-    { fig:'lazo',     col:ROSA,   lado:'der', y:'13%', tam:48, rot:8,   dur:5.4, del:.9 },
-    { fig:'conejo',   col:BLANCO, lado:'der', y:'27%', tam:52, rot:7,   dur:7.0, del:.4 },
-    { fig:'estrella', col:CREMA,  lado:'izq', y:'36%', tam:36, rot:-12, dur:5.0, del:1.4 },
-    { fig:'corazon',  col:ROSA,   lado:'izq', y:'52%', tam:34, rot:9,   dur:4.6, del:.7 },
-    { fig:'oso',      col:'#f6dcc4', lado:'der', y:'60%', tam:52, rot:-8, dur:7.4, del:1.7 },
-    { fig:'flor',     col:LILA,   lado:'der', y:'78%', tam:40, rot:11,  dur:5.8, del:.5 },
-    { fig:'gatoDormido', col:ROSA, lado:'izq', y:'86%', tam:52, rot:-7, dur:8.2, del:1.9 }
+    { fig:'lazo',     col:ROSA,  lado:'der', y:'16%', tam:40, rot:8,   dur:5.4, del:.9 },
+    { fig:'estrella', col:CREMA, lado:'izq', y:'44%', tam:30, rot:-12, dur:5.0, del:1.4 },
+    { fig:'corazon',  col:ROSA,  lado:'der', y:'59%', tam:28, rot:9,   dur:4.6, del:.7 },
+    { fig:'flor',     col:LILA,  lado:'izq', y:'72%', tam:34, rot:11,  dur:5.8, del:.5 }
   ];
 
   function montarDecoracion(){
@@ -1104,57 +1211,126 @@ const CARTA = {
     $('#sep-fig').innerHTML = dibujo('lazo', ROSA);
   }
 
-  /* --- las fotos, repartidas por toda la carta --- */
-  function montarLaminas(){
-    const laminas = Array.isArray(CARTA.laminas) ? CARTA.laminas : [];
+  /* --- los stickers ---
+     Vienen ya recortados y con su borde blanco, así que se ponen
+     enteros: solo hay que darles tamaño, sitio y movimiento. */
+  function montarStickers(){
+    const lista = Array.isArray(CARTA.stickers) ? CARTA.stickers : [];
+    const hoja = $('#hoja');
 
-    laminas.forEach((l, i) => {
-      const punto = document.getElementById('p' + (i + 1));
-      if (!punto || !l.src) return;
+    lista.forEach(s => {
+      if (!s.img) return;
 
-      const fig = document.createElement('figure');
-      fig.className = 'lamina ' + (l.mov || 'mov-respira');
-      fig.style.setProperty('--base', (l.giro || 0) + 'deg');
+      const caja = document.createElement('span');
+      caja.className = 'sticker ' + (s.mov || 'st-dormir');
+      caja.style.setProperty('--base', (s.giro || 0) + 'deg');
+      caja.style.width = (s.tam || 130) + 'px';
+      if (s.quien) caja.setAttribute('aria-label', s.quien);
 
       const img = document.createElement('img');
-      img.src = encodeURI(l.src);
       img.alt = '';
-      img.loading = 'lazy';
       img.decoding = 'async';
+      img.loading  = 'lazy';
+      img.addEventListener('load', () => img.classList.add('puesta'));
 
-      // si una foto falta o está mal escrita, no deja un hueco feo
-      img.addEventListener('error', () => fig.remove());
+      // Se prueban varias rutas: da igual si los stickers están dentro de
+      // la carpeta "img" o sueltos junto al index.html. Si no aparece por
+      // ningún lado, el sticker se quita solo en vez de dejar la imagen rota.
+      const soloNombre = s.img.split('/').pop();
+      const rutas = [s.img];
+      if (s.img.indexOf('/') > -1) rutas.push(soloNombre);
+      else rutas.push('img/' + soloNombre);
 
-      fig.appendChild(img);
-      punto.appendChild(fig);
+      let intento = 0;
+      img.addEventListener('error', () => {
+        intento++;
+        if (intento < rutas.length) img.src = encodeURI(rutas[intento]);
+        else caja.remove();
+      });
+
+      img.src = encodeURI(rutas[0]);
+      if (img.complete && img.naturalWidth) img.classList.add('puesta');
+
+      caja.appendChild(img);
+
+      if (s.en === 'izq' || s.en === 'der'){
+        caja.classList.add('pegado');
+        caja.style.top = s.y || '20%';
+        const fuera = 'calc(-' + (s.tam || 88) + 'px * 0.4)';
+        if (s.en === 'izq') caja.style.left  = fuera;
+        else                caja.style.right = fuera;
+        hoja.appendChild(caja);
+      } else {
+        const punto = document.getElementById(s.en || 'p1');
+        if (!punto) return;
+        caja.classList.add('centro');
+        if (s.lado === 'izq') caja.classList.add('lado-izq');
+        if (s.lado === 'der') caja.classList.add('lado-der');
+        punto.appendChild(caja);
+      }
     });
   }
 
   /* --- movimiento en profundidad al deslizar --- */
-  function montarParallax(){
-    if (menosMovimiento) return;
-    const figs = Array.prototype.slice.call(document.querySelectorAll('.decor .fig'));
-    let ultimo = 0;
+  let parallaxListo = false;
 
-    function mover(){
-      const y = cuantoBajo();
-      figs.forEach(f => {
-        const p = parseFloat(f.dataset.prof) || 0.15;
-        f.style.transform = 'translate3d(0,' + (-y * p) + 'px,0)';
-      });
+  function montarParallax(){
+    if (menosMovimiento || parallaxListo) return;   // que no se duplique al reabrir
+
+    const figs = Array.prototype.slice.call(document.querySelectorAll('.decor .fig'));
+    if (!figs.length) return;
+    parallaxListo = true;
+
+    // guardar la profundidad una sola vez, así no la parseamos en cada frame
+    const capas = figs.map(f => ({
+      el: f,
+      prof: parseFloat(f.dataset.prof) || 0.15,
+      x: 0    // posición actual, que va persiguiendo a "y" con suavizado
+    }));
+
+    let objetivo = cuantoBajo();
+    let corriendo = false;
+
+    // rAF continuo mientras la posición "actual" no haya alcanzado al scroll.
+    // Con lerp de 0.16: cada frame se acerca un 16% al objetivo. El movimiento
+    // queda tipo mantequilla en vez de saltar en escalones.
+    function tick(){
+      let vivo = false;
+      for (let i = 0; i < capas.length; i++){
+        const c = capas[i];
+        const meta = -objetivo * c.prof;
+        const dif = meta - c.x;
+        if (Math.abs(dif) > 0.08){
+          c.x += dif * 0.16;
+          vivo = true;
+        } else {
+          c.x = meta;
+        }
+        // translate3d fuerza aceleración por GPU (no se puede animar 'top')
+        c.el.style.transform = 'translate3d(0,' + c.x.toFixed(2) + 'px,0)';
+      }
+      if (vivo) requestAnimationFrame(tick);
+      else corriendo = false;
     }
 
-    // Sin requestAnimationFrame a propósito: si el navegador lo congela,
-    // el parallax se quedaría clavado. Con un límite de tiempo va igual de
-    // suave y no depende de nada.
-    window.addEventListener('scroll', () => {
-      const ahora = Date.now();
-      if (ahora - ultimo < 16) return;
-      ultimo = ahora;
-      mover();
-    }, { passive: true });
+    function arrancar(){
+      objetivo = cuantoBajo();
+      if (!corriendo){
+        corriendo = true;
+        requestAnimationFrame(tick);
+      }
+    }
 
-    mover();
+    // scroll pasivo: iOS lo dispara con hueco al frenar, pero rAF sigue
+    // suavizando entre eventos hasta que la posición cuadra
+    window.addEventListener('scroll', arrancar, { passive: true });
+    window.addEventListener('resize', arrancar);
+
+    // primera pasada, sin animación (para que salgan ya en su sitio)
+    capas.forEach(c => {
+      c.x = -objetivo * c.prof;
+      c.el.style.transform = 'translate3d(0,' + c.x + 'px,0)';
+    });
   }
 
   /* ============================================================
@@ -1166,7 +1342,7 @@ const CARTA = {
 
   $('#nombre-portada').textContent  = CARTA.ella;
   $('#nombre-carta').textContent    = CARTA.ella;
-  $('#sello').textContent           = CARTA.inicialSello;
+  $('#sello-texto').textContent     = CARTA.inicialSello;
   $('#firma-nombre').textContent    = CARTA.tu;
   $('#despedida').textContent       = CARTA.despedida;
   $('#cita-1').textContent          = CARTA.cita1;
@@ -1225,7 +1401,7 @@ const CARTA = {
   }
 
   montarDecoracion();
-  montarLaminas();
+  montarStickers();
 
   /* ============================================================
      3. CIELO ESTRELLADO
@@ -1344,10 +1520,18 @@ const CARTA = {
   const escena = $('#escena');
   const hoja   = $('#hoja');
   let abierto = false;
+  let pendientes = [];          // los tiempos de la apertura, por si cierra antes
+
+  function agendar(fn, ms){
+    pendientes.push(setTimeout(fn, ms));
+  }
 
   function abrir(){
     if (abierto) return;
     abierto = true;
+
+    pendientes.forEach(clearTimeout);
+    pendientes = [];
 
     escena.classList.add('abriendo');
     sobre.classList.add('abierto');
@@ -1356,29 +1540,29 @@ const CARTA = {
     // El toque de ella es el gesto que iOS exige para dejar sonar el audio.
     arrancarMusica();
 
-    setTimeout(() => {
+    agendar(() => {
       escena.classList.add('fuera');
       $('#velo').classList.add('ver');
       $('#decor').classList.add('ver');
       lanzarFugaz();
     }, 1450);
 
-    setTimeout(() => {
+    agendar(() => {
       hoja.classList.add('abierta');
       activarScroll();
-      setTimeout(() => hoja.classList.add('ver'), 40);
+      agendar(() => hoja.classList.add('ver'), 40);
       $('#controles').classList.add('ver');
       montarParallax();
     }, 1900);
 
-    setTimeout(() => {
+    agendar(() => {
       escena.style.display = 'none';
       vigilarNumeros();
       $('#baja').classList.add('ver');
     }, 3100);
 
     // Red de seguridad: pase lo que pase, la hoja se ve.
-    setTimeout(() => {
+    agendar(() => {
       hoja.classList.add('abierta', 'ver');
       activarScroll();
       $('#decor').classList.add('ver');
@@ -1388,6 +1572,66 @@ const CARTA = {
         hoja.style.transform = 'none';
       }
     }, 4500);
+  }
+
+  /* --- cerrar la carta y dejar el sobre listo para abrirlo otra vez --- */
+  function cerrar(){
+    if (!abierto) return;
+    abierto = false;
+
+    // cancelar lo que quedara a medias de la apertura
+    pendientes.forEach(clearTimeout);
+    pendientes = [];
+    if (soltarNumeros) soltarNumeros();
+
+    vibrar(10);
+    window.scrollTo(0, 0);
+
+    // la hoja se recoge
+    hoja.style.transition = '';
+    hoja.style.opacity = '';
+    hoja.style.transform = '';
+    hoja.classList.remove('ver');
+
+    $('#velo').classList.remove('ver');
+    $('#decor').classList.remove('ver');
+    $('#controles').classList.remove('ver');
+    $('#baja').classList.remove('ver');
+    $('#respuesta').classList.remove('ver');
+
+    // el sobre vuelve, cerrado y con su sello
+    escena.style.display = '';
+    void escena.offsetHeight;          // que el navegador registre el cambio
+    escena.classList.remove('fuera', 'abriendo');
+    sobre.classList.remove('abierto');
+
+    agendar(() => {
+      hoja.classList.remove('abierta');
+      document.documentElement.classList.remove('leyendo');
+      window.scrollTo(0, 0);
+
+      // los días vuelven a cero, para que se cuenten otra vez al reabrir
+      numerosHechos = false;
+      hitos.forEach((h, i) => {
+        const el = document.getElementById('num-' + i);
+        if (el) el.textContent = '0';
+      });
+      yaBajo = false;
+
+      reiniciarPortada();
+    }, 900);
+  }
+
+  // las animaciones de entrada del sobre solo corren una vez; hay que
+  // rebobinarlas a mano para que la reapertura se vea igual de bonita
+  function reiniciarPortada(){
+    ['.intro', '.sobre-zona', '.pista'].forEach(sel => {
+      const el = escena.querySelector(sel);
+      if (!el) return;
+      el.style.animation = 'none';
+      void el.offsetHeight;
+      el.style.animation = '';
+    });
   }
 
   sobre.addEventListener('click', abrir);
@@ -1424,20 +1668,29 @@ const CARTA = {
     });
   }
 
+  let soltarNumeros = null;   // para poder dejar de vigilar si se cierra la carta
+
   function vigilarNumeros(){
+    if (soltarNumeros) soltarNumeros();
     const zona = $('#hitos');
 
     function revisar(){
       const r = zona.getBoundingClientRect();
       if (r.top < vh() * 0.85 && r.bottom > 0){
         animarNumeros();
-        window.removeEventListener('scroll', revisar);
-        clearInterval(repaso);
+        soltar();
       }
+    }
+
+    function soltar(){
+      window.removeEventListener('scroll', revisar);
+      clearInterval(repaso);
+      soltarNumeros = null;
     }
 
     window.addEventListener('scroll', revisar, { passive: true });
     const repaso = setInterval(revisar, 500);
+    soltarNumeros = soltar;
     revisar();
   }
 
@@ -1458,9 +1711,7 @@ const CARTA = {
     lluviaDeCorazones();
   });
 
-  $('#btn-otra').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: menosMovimiento ? 'auto' : 'smooth' });
-  });
+  $('#btn-cerrar').addEventListener('click', cerrar);
 
   function lluviaDeCorazones(){
     if (menosMovimiento) return;
@@ -1500,7 +1751,23 @@ const CARTA = {
   }
 
   if (CARTA.cancion){
-    audio.src = encodeURI(CARTA.cancion);
+    // igual que con los stickers: da igual dónde esté guardado el MP3
+    const nombreMp3 = CARTA.cancion.split('/').pop();
+    const rutasMp3 = [CARTA.cancion];
+    if (CARTA.cancion.indexOf('/') > -1) rutasMp3.push(nombreMp3);
+    else rutasMp3.push('img/' + nombreMp3);
+
+    let intentoMp3 = 0;
+    audio.addEventListener('error', () => {
+      intentoMp3++;
+      if (intentoMp3 < rutasMp3.length){
+        audio.src = encodeURI(rutasMp3[intentoMp3]);
+        audio.load();
+        if (sonando) audio.play().catch(() => {});
+      }
+    });
+
+    audio.src = encodeURI(rutasMp3[0]);
     audio.loop = true;
   } else {
     $('#controles').style.display = 'none';   // sin canción, el botón sobra
